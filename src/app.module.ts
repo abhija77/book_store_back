@@ -5,17 +5,20 @@ import { AppService } from './app.service';
 import { Book } from './book';
 
 @Module({
-  imports: [ TypeOrmModule.forRoot({
+  imports: [TypeOrmModule.forRoot({
     type: 'mysql',
     host: 'localhost',
     port: 3306,
-    username: 'phpmyadmin',
-    password: 'admin',
+    username: 'root',
+    password: '',
     database: 'book_store',
     entities: [Book],
     synchronize: true
-  }), HttpModule],
+  }),
+    HttpModule,
+  TypeOrmModule.forFeature([Book]),
+  ],
   controllers: [AppController],
   providers: [AppService],
 })
-export class AppModule {}
+export class AppModule { }

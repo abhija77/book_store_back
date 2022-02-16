@@ -11,12 +11,14 @@ export class Book {
     id_book: number;
 
     @Column({
-        type: "mediumtext"
+        type: "mediumtext",
+        nullable: true
     })
     url_content: string;
 
     @Column({
-        type: "longtext"
+        type: "longtext",
+        nullable: true
     })
     tokenList: string;
 }
