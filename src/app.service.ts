@@ -46,6 +46,8 @@ const wordsNotAllowed = [
 
 @Injectable()
 export class AppService {
+
+
   constructor(private http: HttpService, private connection: Connection, @InjectRepository(Book)
   private booksRepository: Repository<BookInterface>) {
 
@@ -57,12 +59,9 @@ export class AppService {
     return null;
   }
 
-
-  resolveText(text: string) {
-    const words: BookWords[] = [];
+  tokenize(text){
     const allWords: string[] = text.replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/\r\n]/gi, " ")
       .split(" ").filter(word => word != '').map(word => word.toLowerCase());
-    let wordMostPresent: BookWords = null;
     const wordsF = allWords
       .filter(val => {
 
@@ -70,8 +69,16 @@ export class AppService {
         return !wordsNotAllowed.find(val => val == value);
       }
       );
-    let wordNumber: number = allWords.length;
-    wordsF.forEach((value: string) => {
+
+    return {size: allWords.length, words: wordsF};
+  }
+
+  resolveText(text: string) {
+    const words: BookWords[] = [];
+    const list = this.tokenize(text);
+    let wordMostPresent: BookWords = null;
+    let wordNumber: number = list.size;
+    list.words.forEach((value: string) => {
 
       const word: BookWords[] = words.filter((book: BookWords) => book.token.toLowerCase() === value.toLowerCase() && book.token.length == value.length);
       let obj = word.length > 0 ?
@@ -99,6 +106,8 @@ export class AppService {
     return words;
 
   }
+
+
 
   async createMany(url: any) {
     const queryRunner = this.connection.createQueryRunner();
@@ -152,6 +161,10 @@ export class AppService {
 
   async getBookId(id: number) {
     return this.booksRepository.findOne(id);
+  }
+
+  doInvertion(content: string) {
+    const list = this.tokenize(content);
   }
 
 }

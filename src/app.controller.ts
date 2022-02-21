@@ -35,6 +35,11 @@ export class AppController {
     return response;
   }
 
+  @Get("/books/inverted/update")
+  async doInvertion(){
+    // return this.appService.doInvertion();
+  }
+
   @Get("/book/detail/:id")
   async getBookDetail(@Param("id")id: number){
     let response = await axios.get(`${HOST_GUTENBERG}/books/${id}`).then(value => value.data);
