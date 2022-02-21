@@ -9,8 +9,8 @@ import { Book } from './book';
     type: 'mysql',
     host: 'localhost',
     port: 3306,
-    username: 'root',
-    password: '',
+    username: 'phpmyadmin',
+    password: 'admin',
     database: 'book_store',
     entities: [Book],
     synchronize: true
