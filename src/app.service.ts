@@ -150,4 +150,8 @@ export class AppService {
     return resResolved;
   }
 
+  async getBookId(id: number) {
+    return this.booksRepository.findOne(id);
+  }
+
 }

@@ -12,9 +12,7 @@ export class AppController {
 
   @Get("/book/:id")
   async getBookTokens(@Param("id") id: number) {
-    console.log(id);
-
-    this.appService.getTokens(id)
+    return this.appService.getBookId(id);
   }
 
   @Get("/books")
