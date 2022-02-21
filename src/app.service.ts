@@ -158,4 +158,29 @@ export class AppService {
     return this.booksRepository.findOne(id);
   }
 
+  async algojaccard(v1, v2) {
+
+    {
+      /*Nombre d’éléments contenus dans les deux vecteurs (intersection)*/
+      let i: number = 0;
+      /*Nombre d’éléments total des deux vecteurs (union)*/
+      let u: number = 0;
+      /*On parcourt le premier vecteur d’occurrence*/
+      for (const [w, c] of (Object.entries(v1) as [string, number][])) {
+        /*On ajoute le nombre d’occurrence du mot à l'union*/
+        u = u + c;
+        /*Si le mot est présent dans le second vecteur on ajoute le nombre d’occurrence à l'intersection*/
+        if (v2[w] != null) {
+          i += c + v2[w];
+        }
+      }
+      /*On parcourt le second vecteur d’occurrence pour ajouter les occurrences à l'union*/
+      for (const [w, c] of (Object.entries(v1) as [string, number][])) {
+        u += c;
+      }
+      /*On retourne l'Indice de Jaccard*/
+      return i / u;
+    }
+
+  }
 }
