@@ -9,10 +9,8 @@ export class AppController {
   constructor(private readonly appService: AppService, private http: HttpService) { }
 
   @Get("/book/:id")
-  async getHello(@Param("id") id: number) {
-    console.log(id);
-
-    this.appService.getTokens(id)
+  async getBookTokens(@Param("id") id: number) {
+    return this.appService.getBookId(id);
   }
 
   @Get("/books")
