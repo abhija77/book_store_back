@@ -1,22 +1,37 @@
-import { Controller, Get, HttpService, Param } from '@nestjs/common';
+import { Controller, Get, HttpService, Param, Response } from '@nestjs/common';
 import { AppService } from './app.service';
 import axios from "axios";
 import BookInterface from './model/book.model';
 import { Any } from 'typeorm';
+
+const HOST_GUTENBERG = "https://gutendex.com";
 
 @Controller()
 export class AppController {
   constructor(private readonly appService: AppService, private http: HttpService) { }
 
   @Get("/book/:id")
-  async getHello(@Param("id") id: number) {
+  async getBookTokens(@Param("id") id: number) {
     console.log(id);
 
     this.appService.getTokens(id)
   }
 
   @Get("/books")
-  async getBooks(): Promise<BookInterface[]> {
+  async getBooks(): Promise<any> {
+    let response = await axios.get(`${HOST_GUTENBERG}/books`).then(value => value.data);
+    return response;
+  }
+
+  @Get("/book/detail/:id")
+  async getBookDetail(@Param("id")id: number){
+    let response = await axios.get(`${HOST_GUTENBERG}/books/${id}`).then(value => value.data);
+    return response;
+  }
+
+
+  @Get("/books/tokens")
+  async getBooksTokens(): Promise<BookInterface[]> {
     return this.appService.findAll();
   }
 
@@ -29,20 +44,17 @@ export class AppController {
   @Get("/updateBooks")
   async updateBooks() {
     const books = await this.appService.findAll();
-    this.toto(books);
-
+    this.tokenize(books);
+    return {message: "books updated"};
   }
 
-  async toto(books) {
+  async tokenize(books) {
 
     for (const element of books) {
 
       if (element.tokenList == null) {
         try {
-          console.log("debut : " + element.id);
           let url = await this.appService.getTokens(element.id_book);
-          console.log("toto");
-
           this.appService.updateBook(element.id, JSON.stringify(url));
         } catch (err) {
           console.log(err);
