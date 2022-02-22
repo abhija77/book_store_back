@@ -59,7 +59,7 @@ export class AppService {
     return null;
   }
 
-  tokenize(text){
+  tokenize(text) {
     const allWords: string[] = text.replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/\r\n]/gi, " ")
       .split(" ").filter(word => word != '').map(word => word.toLowerCase());
     const wordsF = allWords
@@ -70,7 +70,7 @@ export class AppService {
       }
       );
 
-    return {size: allWords.length, words: wordsF};
+    return { size: allWords.length, words: wordsF };
   }
 
   resolveText(text: string) {
@@ -191,5 +191,40 @@ export class AppService {
       return i / u;
     }
 
+  }
+
+  //InProgress
+  async tokenInversed() {
+    let books = this.findAll();
+    const objInverted = [];
+    //pour chaque livre
+    (await books).forEach(element => {
+      //stockage des tokens
+      let listToken = JSON.parse(element.tokenList);
+      console.log(listToken);
+
+      //parcour des tokens
+      if (listToken != null) {
+        listToken.forEach(tokens => {
+          //creation object
+          //si le token existe déjà dans le tableau
+          if (objInverted[tokens.token]) {
+            let objWord = { "book": element.id_book, "occurences": tokens.occurence };
+            console.log("là");
+
+            objInverted[tokens.token].push(objWord)
+          }
+          else {
+            console.log("pas là");
+
+            let objWord = { "book": element.id_book, "occurences": tokens.occurence };
+            objInverted[tokens.token] = [];
+            objInverted[tokens.token].push(objWord)
+          }
+
+        });
+      }
+    });
+    console.log(objInverted.length);
   }
 }

@@ -17,31 +17,31 @@ export class AppController {
   }
 
   @Get("/books")
-  async getBooks(@Query("topic") topic: string, @Query("lang") lang: string,@Query("limit") limit: number): Promise<any> {
+  async getBooks(@Query("topic") topic: string, @Query("lang") lang: string, @Query("limit") limit: number): Promise<any> {
     const askTopic = topic != null;
     const askLang = lang != null;
     let url = `${HOST_GUTENBERG}/books`;
-    if(askLang && askTopic)
+    if (askLang && askTopic)
       url += `?topic=${topic}&languages=${lang}`;
-    else if(askLang)
+    else if (askLang)
       url += `?languages=${lang}`;
-    else if(askTopic)
+    else if (askTopic)
       url += `?topic=${topic}`;
 
     let response: any = await axios.get(url).then(value => value.data);
-    
-    if(limit && limit > 1)
-      response = response.results.slice(0,limit - 1);
+
+    if (limit && limit > 1)
+      response = response.results.slice(0, limit - 1);
     return response;
   }
 
   @Get("/books/inverted/update")
-  async doInvertion(){
+  async doInvertion() {
     // return this.appService.doInvertion();
   }
 
   @Get("/book/detail/:id")
-  async getBookDetail(@Param("id")id: number){
+  async getBookDetail(@Param("id") id: number) {
     let response = await axios.get(`${HOST_GUTENBERG}/books/${id}`).then(value => value.data);
     return response;
   }
@@ -62,7 +62,7 @@ export class AppController {
   async updateBooks() {
     const books = await this.appService.findAll();
     this.tokenize(books);
-    return {message: "books updated"};
+    return { message: "books updated" };
   }
 
   async tokenize(books) {
@@ -124,5 +124,10 @@ export class AppController {
         1
     }
     return this.appService.algojaccard(v1, v2);
+  }
+
+  @Get("/inversedToken")
+  async inversed() {
+    return this.appService.tokenInversed();
   }
 }
