@@ -12,11 +12,6 @@ const HOST_GUTENBERG = "https://gutendex.com";
 export class AppController {
   constructor(private readonly appService: AppService, private http: HttpService) { }
 
-  @Get("/book/:id")
-  async getBookTokens(@Param("id") id: number) {
-    return this.appService.getBookId(id);
-  }
-
   @Get("/books")
   async getBooks(@Query("topic") topic: string, @Query("lang") lang: string, @Query("limit") limit: number): Promise<any> {
     const askTopic = topic != null;
@@ -36,11 +31,6 @@ export class AppController {
     return response;
   }
 
-  @Get("/books/inverted/update")
-  async doInvertion() {
-    // return this.appService.doInvertion();
-  }
-
   @Get("/book/detail/:id")
   async getBookDetail(@Param("id") id: number) {
     let response = await axios.get(`${HOST_GUTENBERG}/books/${id}`).then(value => value.data);
@@ -48,37 +38,12 @@ export class AppController {
   }
 
 
-  @Get("/books/tokens")
-  async getBooksTokens(): Promise<BookInterface[]> {
-    return this.appService.findAll();
-  }
-
   @Get("/addBooks")
   async addBooks() {
     let url = "https://gutendex.com/books"
     return this.appService.createMany(url);
   }
 
-  @Get("/updateBooks")
-  async updateBooks() {
-  }
-
-  async tokenize(books) {
-    let tab = []
-    for (const element of books) {
-
-      // if (element.tokenList == null) {
-      try {
-        let tokens = await this.appService.getTokens(element.id_book);
-        tab.push(tokens)
-      } catch (err) {
-        console.log(err);
-
-      }
-      // }
-    }
-    return tab
-  }
 
   @Get("/jaccard")
   async jaccard() {
@@ -127,7 +92,6 @@ export class AppController {
 
   @Get("/indexation")
   async indexation() {
-    const books = await this.appService.findAll();
-    this.appService.indexation(this.tokenize(books));
+    return this.appService.indexation();
   }
 }

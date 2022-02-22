@@ -61,7 +61,9 @@ export class AppService {
 
   tokenize(text) {
     const allWords: string[] = text.replace(/[`~!@#$%^&*()_|+\-=?;:'",.<>\{\}\[\]\\\/\r\n]/gi, " ")
-      .split(" ").filter(word => word != '').map(word => word.toLowerCase());
+      .split(" ")
+      .filter(word => word != '')
+      .map(word => word.toLowerCase());
     const wordsF = allWords
       .filter(val => {
 
@@ -78,6 +80,7 @@ export class AppService {
     const list = this.tokenize(text);
     let wordMostPresent: BookWords = null;
     let wordNumber: number = list.size;
+
     list.words.forEach((value: string) => {
 
       const word: BookWords[] = words.filter((book: BookWords) => book.token.toLowerCase() === value.toLowerCase() && book.token.length == value.length);
@@ -134,37 +137,20 @@ export class AppService {
 
     });
   }
-  // async updateBook(idUpdate: number, token: any) {
-  //   try {
-  //     await getConnection()
-  //       .createQueryBuilder()
-  //       .update(Book)
-  //       .set({ tokenList: token })
-  //       .where("id = :id", { id: idUpdate })
-  //       .execute();
-  //     return this.booksRepository.findOne(idUpdate)
-  //   } catch (err) {
-  //     console.log(err);
 
-  //   }
-  // }
   findAll(): Promise<BookInterface[]> {
     return this.booksRepository.find();
   }
 
-  async getTokens(id: number) {
-    const res = await axios.get("https://www.gutenberg.org/files/" + id + "/" + id + "-0.txt", { timeout: 500000 }).then(value => value.data);
-    const resResolved = this.resolveText(res);
-
+  async getTokens(url) {
+    const res = await axios.get(url)
+      .then(value => { console.log(value.status); return value.data; })
+      .catch(error => { console.log("erreur : " + error) })
+    let resResolved;
+    if (res) {
+      resResolved = this.resolveText(res);
+    }
     return resResolved;
-  }
-
-  async getBookId(id: number) {
-    return this.booksRepository.findOne(id);
-  }
-
-  doInvertion(content: string) {
-    const list = this.tokenize(content);
   }
 
   async algojaccard(v1, v2) {
@@ -194,38 +180,53 @@ export class AppService {
   }
 
   //InProgress
-  async indexation(books) {
-    let objInverted = {};
-    //pour chaque livre
-    (await books).forEach(element => {
-      console.log(element);
+  async getIndexTable() {
+    let indexTable = {};
+    let books = await this.findAll();
+    // books.forEach(async book => {
+    //   const listToken =  await this.getTokens(book.url_content);
+    //   console.log(listToken);
+    //   if (listToken != null && listToken != []) {
+    //     listToken.forEach(tokens => {
+    //       console.log("running");
+    //       let objWord;
+    //       if (indexTable[tokens.token]) {
+    //         objWord = { "book": book.id_book, "occurences": tokens.occurence };
+    //       }
+    //       else {
+    //         objWord = { "book": book.id_book, "occurences": tokens.occurence };
+    //         indexTable[tokens.token] = [];
+    //       }
+    //       indexTable[tokens.token].push(objWord)
+    //     });
+    //   }
+    // });
+    for (const (book: BookInterface) of books) {
+      const listToken = await this.getTokens(book.url_content);
+      console.log(listToken);
+      if (listToken != null && listToken != []) {
+        listToken.forEach(tokens => {
+          console.log("running");
+          let objWord;
+          if (indexTable[tokens.token]) {
+            objWord = { "book": book.id_book, "occurences": tokens.occurence };
+          }
+          else {
+            objWord = { "book": book.id_book, "occurences": tokens.occurence };
+            indexTable[tokens.token] = [];
+          }
+          indexTable[tokens.token].push(objWord)
+        });
+      }
+      console.log("finish");
+      return indexTable;
 
-      //stockage des tokens
-      // let listToken = JSON.parse(element.tokenList);
+    }
+  }
 
-      // //parcour des tokens
-      // if (listToken != null) {
-      //   listToken.forEach(tokens => {
-      //     if (tokens.token)
-      //       //creation object
-      //       //si le token existe déjà dans le tableau
-      //       if (objInverted[tokens.token]) {
-      //         let objWord = { "book": element.id_book, "occurences": tokens.occurence };
+  async indexation() {
+    console.log("salut");
+    return await this.getIndexTable();
 
-      //         objInverted[tokens.token].push(objWord)
-      //         console.log(tokens.token);
-      //         console.log(objInverted[tokens.token]);
-
-      //       }
-      //       else {
-
-      //         let objWord = { "book": element.id_book, "occurences": tokens.occurence };
-      //         objInverted[tokens.token] = [];
-      //         objInverted[tokens.token].push(objWord)
-      //       }
-
-      //   });
-      // }
-    });
   }
 }
