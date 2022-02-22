@@ -196,12 +196,11 @@ export class AppService {
   //InProgress
   async tokenInversed() {
     let books = this.findAll();
-    const objInverted = [];
+    let objInverted = {};
     //pour chaque livre
     (await books).forEach(element => {
       //stockage des tokens
       let listToken = JSON.parse(element.tokenList);
-      console.log(listToken);
 
       //parcour des tokens
       if (listToken != null) {
@@ -210,12 +209,10 @@ export class AppService {
           //si le token existe déjà dans le tableau
           if (objInverted[tokens.token]) {
             let objWord = { "book": element.id_book, "occurences": tokens.occurence };
-            console.log("là");
 
             objInverted[tokens.token].push(objWord)
           }
           else {
-            console.log("pas là");
 
             let objWord = { "book": element.id_book, "occurences": tokens.occurence };
             objInverted[tokens.token] = [];
@@ -225,6 +222,6 @@ export class AppService {
         });
       }
     });
-    console.log(objInverted.length);
+    console.log(objInverted);
   }
 }
