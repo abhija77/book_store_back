@@ -4,6 +4,7 @@ import axios, { Axios } from "axios";
 import BookInterface from './model/book.model';
 import { Any } from 'typeorm';
 import { IncomingMessage, ServerResponse } from 'http';
+import { url } from 'inspector';
 
 const HOST_GUTENBERG = "https://gutendex.com";
 
@@ -60,25 +61,23 @@ export class AppController {
 
   @Get("/updateBooks")
   async updateBooks() {
-    const books = await this.appService.findAll();
-    this.tokenize(books);
-    return { message: "books updated" };
   }
 
   async tokenize(books) {
-
+    let tab = []
     for (const element of books) {
 
-      if (element.tokenList == null) {
-        try {
-          let url = await this.appService.getTokens(element.id_book);
-          this.appService.updateBook(element.id, JSON.stringify(url));
-        } catch (err) {
-          console.log(err);
+      // if (element.tokenList == null) {
+      try {
+        let tokens = await this.appService.getTokens(element.id_book);
+        tab.push(tokens)
+      } catch (err) {
+        console.log(err);
 
-        }
       }
+      // }
     }
+    return tab
   }
 
   @Get("/jaccard")
@@ -126,8 +125,9 @@ export class AppController {
     return this.appService.algojaccard(v1, v2);
   }
 
-  @Get("/inversedToken")
-  async inversed() {
-    return this.appService.tokenInversed();
+  @Get("/indexation")
+  async indexation() {
+    const books = await this.appService.findAll();
+    this.appService.indexation(this.tokenize(books));
   }
 }

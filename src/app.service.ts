@@ -134,20 +134,20 @@ export class AppService {
 
     });
   }
-  async updateBook(idUpdate: number, token: any) {
-    try {
-      await getConnection()
-        .createQueryBuilder()
-        .update(Book)
-        .set({ tokenList: token })
-        .where("id = :id", { id: idUpdate })
-        .execute();
-      return this.booksRepository.findOne(idUpdate)
-    } catch (err) {
-      console.log(err);
+  // async updateBook(idUpdate: number, token: any) {
+  //   try {
+  //     await getConnection()
+  //       .createQueryBuilder()
+  //       .update(Book)
+  //       .set({ tokenList: token })
+  //       .where("id = :id", { id: idUpdate })
+  //       .execute();
+  //     return this.booksRepository.findOne(idUpdate)
+  //   } catch (err) {
+  //     console.log(err);
 
-    }
-  }
+  //   }
+  // }
   findAll(): Promise<BookInterface[]> {
     return this.booksRepository.find();
   }
@@ -194,34 +194,38 @@ export class AppService {
   }
 
   //InProgress
-  async tokenInversed() {
-    let books = this.findAll();
+  async indexation(books) {
     let objInverted = {};
     //pour chaque livre
     (await books).forEach(element => {
+      console.log(element);
+
       //stockage des tokens
-      let listToken = JSON.parse(element.tokenList);
+      // let listToken = JSON.parse(element.tokenList);
 
-      //parcour des tokens
-      if (listToken != null) {
-        listToken.forEach(tokens => {
-          //creation object
-          //si le token existe déjà dans le tableau
-          if (objInverted[tokens.token]) {
-            let objWord = { "book": element.id_book, "occurences": tokens.occurence };
+      // //parcour des tokens
+      // if (listToken != null) {
+      //   listToken.forEach(tokens => {
+      //     if (tokens.token)
+      //       //creation object
+      //       //si le token existe déjà dans le tableau
+      //       if (objInverted[tokens.token]) {
+      //         let objWord = { "book": element.id_book, "occurences": tokens.occurence };
 
-            objInverted[tokens.token].push(objWord)
-          }
-          else {
+      //         objInverted[tokens.token].push(objWord)
+      //         console.log(tokens.token);
+      //         console.log(objInverted[tokens.token]);
 
-            let objWord = { "book": element.id_book, "occurences": tokens.occurence };
-            objInverted[tokens.token] = [];
-            objInverted[tokens.token].push(objWord)
-          }
+      //       }
+      //       else {
 
-        });
-      }
+      //         let objWord = { "book": element.id_book, "occurences": tokens.occurence };
+      //         objInverted[tokens.token] = [];
+      //         objInverted[tokens.token].push(objWord)
+      //       }
+
+      //   });
+      // }
     });
-    console.log(objInverted);
   }
 }

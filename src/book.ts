@@ -16,9 +16,5 @@ export class Book {
     })
     url_content: string;
 
-    @Column({
-        type: "longtext",
-        nullable: true
-    })
-    tokenList: string;
+
 }

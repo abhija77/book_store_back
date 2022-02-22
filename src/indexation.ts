@@ -1,7 +1,7 @@
 import { Column, Entity, PrimaryGeneratedColumn } from "typeorm";
 
 @Entity()
-export class InvertedToken {
+export class Indexation {
 
     @PrimaryGeneratedColumn()
     id: number;
@@ -9,6 +9,4 @@ export class InvertedToken {
     @Column()
     token: string;
 
-    @Column()
-    positions: string;
 }
