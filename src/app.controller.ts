@@ -40,56 +40,58 @@ export class AppController {
 
   @Get("/addBooks")
   async addBooks() {
-    let url = "https://gutendex.com/books"
+    let url = `${HOST_GUTENBERG}/books`;
     return this.appService.createMany(url);
   }
 
 
-  @Get("/jaccard")
-  async jaccard() {
-    let v1 = {
-      "le": 1,
-      "moteur":
-        1,
-      "de":
-        2,
-      "recherche":
-        2,
-      "ideal":
-        1,
-      "doit":
-        1,
-      "comprendre":
-        1,
-      "exactement":
-        2,
-      "l":
-        1,
-      "objet":
-        1,
-      "la":
-        1,
-      "pour":
-        1,
-      "fournir":
-        1,
-      "les":
-        1,
-      "informations":
-        1,
-      "demandees":
-        1
-    }
+  // @Get("/jaccard/:word")
+  // async jaccard(@Param("word") word: string) {
+  //   let v1 = {
+  //     "le": 1,
+  //     "moteur":
+  //       1,
+  //     "de":
+  //       2,
+  //     "recherche":
+  //       2,
+  //     "ideal":
+  //       1,
+  //     "doit":
+  //       1,
+  //     "comprendre":
+  //       1,
+  //     "exactement":
+  //       2,
+  //     "l":
+  //       1,
+  //     "objet":
+  //       1,
+  //     "la":
+  //       1,
+  //     "pour":
+  //       1,
+  //     "fournir":
+  //       1,
+  //     "les":
+  //       1,
+  //     "informations":
+  //       1,
+  //     "demandees":
+  //       1
+  //   }
 
-    let v2 = {
-      "le":
-        2,
-      "moustachee":
-        1
-    }
-    return this.appService.algojaccard(v1, v2);
+  //   let v2 = {
+  //     "le":
+  //       2
+  //   }
+  //   // return this.appService.algojaccard(v1, v2);
+  //   return this.appService.algojaccard(word)
+  // }
+  @Get("indexationJaccard")
+  async indexationJaccard() {
+    return this.appService.indexationJaccard();
   }
-
   @Get("/indexation")
   async indexation() {
     return this.appService.indexation();

@@ -6,6 +6,7 @@ import { Observable, timeout } from 'rxjs';
 import { Connection, getConnection, Repository } from 'typeorm';
 import { Book } from './book';
 import { Indexation } from './indexation';
+import { IndexationJaccard } from './indexationJaccard';
 import BookWords from './model/book-words.model';
 import BookInterface from './model/book.model';
 
@@ -50,7 +51,7 @@ export class AppService {
 
 
   constructor(private http: HttpService, private connection: Connection, @InjectRepository(Book)
-  private booksRepository: Repository<BookInterface>,@InjectRepository(Indexation) private indexationRepo: Repository<Indexation>) {
+  private booksRepository: Repository<BookInterface>, @InjectRepository(Indexation) private indexationRepo: Repository<Indexation>, @InjectRepository(IndexationJaccard) private indexationJaccardRepo: Repository<IndexationJaccard>) {
 
   }
 
@@ -156,27 +157,26 @@ export class AppService {
 
   async algojaccard(v1, v2) {
 
-    {
-      /*Nombre d’éléments contenus dans les deux vecteurs (intersection)*/
-      let i: number = 0;
-      /*Nombre d’éléments total des deux vecteurs (union)*/
-      let u: number = 0;
-      /*On parcourt le premier vecteur d’occurrence*/
-      for (const [w, c] of (Object.entries(v1) as [string, number][])) {
-        /*On ajoute le nombre d’occurrence du mot à l'union*/
-        u = u + c;
-        /*Si le mot est présent dans le second vecteur on ajoute le nombre d’occurrence à l'intersection*/
-        if (v2[w] != null) {
-          i += c + v2[w];
-        }
-      }
-      /*On parcourt le second vecteur d’occurrence pour ajouter les occurrences à l'union*/
-      for (const [w, c] of (Object.entries(v1) as [string, number][])) {
-        u += c;
-      }
-      /*On retourne l'Indice de Jaccard*/
-      return i / u;
-    }
+    // /*Nombre d’éléments contenus dans les deux vecteurs (intersection)*/
+    // let i: number = 0;
+    // /*Nombre d’éléments total des deux vecteurs (union)*/
+    // let u: number = 0;
+    // /*On parcourt le premier vecteur d’occurrence*/
+    // for (const [w, c] of (Object.entries(v1) as [string, number][])) {
+    //   /*On ajoute le nombre d’occurrence du mot à l'union*/
+    //   u = u + c;
+    //   /*Si le mot est présent dans le second vecteur on ajoute le nombre d’occurrence à l'intersection*/
+    //   if (v2[w] != null) {
+    //     i += c + v2[w];
+    //   }
+    // }
+    // /*On parcourt le second vecteur d’occurrence pour ajouter les occurrences à l'union*/
+    // for (const [w, c] of (Object.entries(v1) as [string, number][])) {
+    //   u += c;
+    // }
+    // /*On retourne l'Indice de Jaccard*/
+    // return i / u;
+    // }
 
   }
 
@@ -187,23 +187,23 @@ export class AppService {
     for (const book of books) {
       let listToken;
       console.log(book);
-      
+
       try {
 
         listToken = await this.getTokens(book.url_content);
-      } catch(e) {
+      } catch (e) {
         console.error(e);
-        
+
       }
       console.log("running");
       if (listToken != null && listToken != []) {
         listToken.forEach(tokens => {
           let objWord;
           if (indexTable[tokens.token]) {
-            objWord = { "book": book.id_book, "occurences": tokens.occurence };
+            objWord = { "book": book.id_book, "occurences": tokens.occurence, "ratio": tokens.ratio };
           }
           else {
-            objWord = { "book": book.id_book, "occurences": tokens.occurence };
+            objWord = { "book": book.id_book, "occurences": tokens.occurence, "ratio": tokens.ratio };
             indexTable[tokens.token] = [];
           }
           indexTable[tokens.token].push(objWord)
@@ -216,7 +216,7 @@ export class AppService {
       index.index = JSON.stringify(indexTable[tok]);
       await this.indexationRepo.save(index);
     })
-    
+
 
     console.log(indexTable);
 
@@ -227,5 +227,25 @@ export class AppService {
     console.log("START INDEXATION");
     return await this.getIndexTable();
 
+  }
+  async indexationJaccard() {
+    //récupérer liste des livres
+    let listBooks: BookInterface[] = await this.findAll();
+    //récupérer tokens pour chaque livre
+    let books = []
+    for (const book of listBooks) {
+      let tokensBook = await this.getTokens(book.url_content);
+      books.push({ "id": book.id_book, "token": tokensBook });
+    }
+    console.log(books);
+    console.log("done");
+    const indexationJaccard = new IndexationJaccard();
+    indexationJaccard.indexJaccard = JSON.stringify(books);
+    await this.indexationJaccardRepo.save(indexationJaccard)
+
+    //créer table indexation jaccard
+    //comparer 2 à 2 livre selon jaccard
+    //stocker resultats sous forme: une ligne = nom du livre : [nom du livre=>distance,...]
+    //stocker base de données la table d'indexation selon le modéle : une ligne = id,id_book,nom du livre,distances
   }
 }
