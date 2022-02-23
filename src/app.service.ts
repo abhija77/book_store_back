@@ -229,7 +229,9 @@ export class AppService {
 
   }
 
-  // async findIndexationOne(word){
-  //   this.indexationRepo.find({where: word})
-  // }
+  async findIndexationOne(word){
+    return this.indexationRepo.findOne({where: {
+      token: word
+    }})
+  }
 }

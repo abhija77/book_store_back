@@ -24,13 +24,18 @@ export class AppController {
       url += `?languages=${lang}`;
     else if (askTopic)
       url += `?topic=${topic}`;
-    let response: any = await axios.get(url).then(value => value.data.results);
+    let response: any[] = await axios.get(url).then(value => value.data.results);
 
     if(askSearch){
+      const resp = await this.appService.findIndexationOne(search);
       
+      if(resp){
+        const idBooks = JSON.parse(resp.index).map(val => val.book);
+        response = response.filter(book => idBooks.indexOf(book.id) > -1);
+      } else {
+        console.log("NOT");
+      }
     }
-
-
     if (limit && limit > 1)
       response = response.slice(0, limit - 1);
     return response;
