@@ -26,13 +26,13 @@ export class AppController {
       url += `?topic=${topic}`;
     let response: any = await axios.get(url).then(value => value.data.results);
 
-    // if(askSearch){
-
-    // }
+    if(askSearch){
+      
+    }
 
 
     if (limit && limit > 1)
-      response = response.results.slice(0, limit - 1);
+      response = response.slice(0, limit - 1);
     return response;
   }
 

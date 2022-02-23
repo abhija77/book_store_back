@@ -228,4 +228,8 @@ export class AppService {
     return await this.getIndexTable();
 
   }
+
+  // async findIndexationOne(word){
+  //   this.indexationRepo.find({where: word})
+  // }
 }
