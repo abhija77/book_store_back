@@ -3,7 +3,8 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { Book } from './book';
-import { InvertedToken } from './inverted-token';
+import { Indexation } from './indexation';
+// import { InvertedToken } from './inverted-token';
 
 @Module({
   imports: [TypeOrmModule.forRoot({
@@ -13,11 +14,11 @@ import { InvertedToken } from './inverted-token';
     username: 'phpmyadmin',
     password: 'admin',
     database: 'book_store',
-    entities: [Book, InvertedToken],
+    entities: [Book, Indexation],
     synchronize: true
   }),
     HttpModule,
-  TypeOrmModule.forFeature([Book]),
+  TypeOrmModule.forFeature([Book,Indexation]),
   ],
   controllers: [AppController],
   providers: [AppService],

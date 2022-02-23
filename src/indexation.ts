@@ -9,4 +9,9 @@ export class Indexation {
     @Column()
     token: string;
 
+    @Column({
+        type: "longtext"
+    })
+    index: string;
+
 }

@@ -5,6 +5,7 @@ import axios, { Axios, AxiosResponse } from 'axios';
 import { Observable, timeout } from 'rxjs';
 import { Connection, getConnection, Repository } from 'typeorm';
 import { Book } from './book';
+import { Indexation } from './indexation';
 import BookWords from './model/book-words.model';
 import BookInterface from './model/book.model';
 
@@ -49,7 +50,7 @@ export class AppService {
 
 
   constructor(private http: HttpService, private connection: Connection, @InjectRepository(Book)
-  private booksRepository: Repository<BookInterface>) {
+  private booksRepository: Repository<BookInterface>,@InjectRepository(Indexation) private indexationRepo: Repository<Indexation>) {
 
   }
 
@@ -183,30 +184,20 @@ export class AppService {
   async getIndexTable() {
     let indexTable = {};
     let books = await this.findAll();
-    // books.forEach(async book => {
-    //   const listToken =  await this.getTokens(book.url_content);
-    //   console.log(listToken);
-    //   if (listToken != null && listToken != []) {
-    //     listToken.forEach(tokens => {
-    //       console.log("running");
-    //       let objWord;
-    //       if (indexTable[tokens.token]) {
-    //         objWord = { "book": book.id_book, "occurences": tokens.occurence };
-    //       }
-    //       else {
-    //         objWord = { "book": book.id_book, "occurences": tokens.occurence };
-    //         indexTable[tokens.token] = [];
-    //       }
-    //       indexTable[tokens.token].push(objWord)
-    //     });
-    //   }
-    // });
-    for (const (book: BookInterface) of books) {
-      const listToken = await this.getTokens(book.url_content);
-      console.log(listToken);
+    for (const book of books) {
+      let listToken;
+      console.log(book);
+      
+      try {
+
+        listToken = await this.getTokens(book.url_content);
+      } catch(e) {
+        console.error(e);
+        
+      }
+      console.log("running");
       if (listToken != null && listToken != []) {
         listToken.forEach(tokens => {
-          console.log("running");
           let objWord;
           if (indexTable[tokens.token]) {
             objWord = { "book": book.id_book, "occurences": tokens.occurence };
@@ -218,14 +209,22 @@ export class AppService {
           indexTable[tokens.token].push(objWord)
         });
       }
-      console.log("finish");
-      return indexTable;
-
     }
+    Object.keys(indexTable).forEach(async tok => {
+      const index = new Indexation();
+      index.token = tok;
+      index.index = JSON.stringify(indexTable[tok]);
+      await this.indexationRepo.save(index);
+    })
+    
+
+    console.log(indexTable);
+
+    return indexTable;
   }
 
   async indexation() {
-    console.log("salut");
+    console.log("START INDEXATION");
     return await this.getIndexTable();
 
   }
