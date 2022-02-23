@@ -231,17 +231,20 @@ export class AppService {
   async indexationJaccard() {
     //récupérer liste des livres
     let listBooks: BookInterface[] = await this.findAll();
+    let listIndexationJaccard = await this.indexationJaccardRepo.find();
     //récupérer tokens pour chaque livre
-    let books = []
-    for (const book of listBooks) {
-      let tokensBook = await this.getTokens(book.url_content);
-      books.push({ "id": book.id_book, "token": tokensBook });
+    if listIndexationJaccard == []) {
+      let books = []
+      for (const book of listBooks) {
+        let tokensBook = await this.getTokens(book.url_content);
+        books.push({ "id": book.id_book, "token": tokensBook });
+      }
+      const indexationJaccard = new IndexationJaccard();
+      indexationJaccard.indexJaccard = JSON.stringify(books);
+      await this.indexationJaccardRepo.save(indexationJaccard)
     }
-    console.log(books);
-    console.log("done");
-    const indexationJaccard = new IndexationJaccard();
-    indexationJaccard.indexJaccard = JSON.stringify(books);
-    await this.indexationJaccardRepo.save(indexationJaccard)
+    console.log(listIndexationJaccard);
+
 
     //créer table indexation jaccard
     //comparer 2 à 2 livre selon jaccard
