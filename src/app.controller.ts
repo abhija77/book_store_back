@@ -13,9 +13,10 @@ export class AppController {
   constructor(private readonly appService: AppService, private http: HttpService) { }
 
   @Get("/books")
-  async getBooks(@Query("topic") topic: string, @Query("lang") lang: string, @Query("limit") limit: number): Promise<any> {
+  async getBooks(@Query("topic") topic: string, @Query("lang") lang: string, @Query("limit") limit: number, @Query("search") search: string): Promise<any> {
     const askTopic = topic != null;
     const askLang = lang != null;
+    const askSearch = search != null;
     let url = `${HOST_GUTENBERG}/books`;
     if (askLang && askTopic)
       url += `?topic=${topic}&languages=${lang}`;
@@ -23,8 +24,12 @@ export class AppController {
       url += `?languages=${lang}`;
     else if (askTopic)
       url += `?topic=${topic}`;
+    let response: any = await axios.get(url).then(value => value.data.results);
 
-    let response: any = await axios.get(url).then(value => value.data);
+    // if(askSearch){
+
+    // }
+
 
     if (limit && limit > 1)
       response = response.results.slice(0, limit - 1);
