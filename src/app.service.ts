@@ -248,4 +248,12 @@ export class AppService {
     //stocker resultats sous forme: une ligne = nom du livre : [nom du livre=>distance,...]
     //stocker base de données la table d'indexation selon le modéle : une ligne = id,id_book,nom du livre,distances
   }
+
+  async findIndexationOne(word) {
+    return this.indexationRepo.findOne({
+      where: {
+        token: word
+      }
+    })
+  }
 }
